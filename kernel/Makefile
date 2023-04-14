@@ -26,6 +26,8 @@ kerLdSrc = kernel.ld
 kerBuildRtPath = build
 kerObj += $(patsubst %.c,%.o,$(addprefix ${kerBuildRtPath}/,${kerCSrcFile}))
 kerObj += $(patsubst %.S,%.o,$(addprefix ${kerBuildRtPath}/,${kerSSrcFile}))
+kerEntryO = ${kerBuildRtPath}/${kerSSrcRtPath}/entry.o
+kerObj := ${kerEntryO} $(filter-out ${kerEntryO},${kerObj})
 kerMetaRtPath = meta
 kerAsm += $(patsubst %.c,%.asm,$(addprefix ${kerMetaRtPath}/,${kerCSrcFile}))
 kerAsm += $(patsubst %.S,%.asm,$(addprefix ${kerMetaRtPath}/,${kerSSrcFile}))
@@ -85,14 +87,27 @@ qemuOpts += -global virtio-mmio.force-legacy=false
 qemuOpts += -drive file=${runCfgFsImgPath},if=none,format=raw,id=x0
 qemuOpts += -device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0
 
+gdbPort = $(shell expr `id -u` % 5000 + 25000)
+qemuGdb = $(shell if $(qemu) -help | grep -q '^-gdb'; \
+	then echo "-gdb tcp::$(gdbPort)"; \
+	else echo "-s -p $(gdbPort)"; fi)
+
+.PHONY: qemu qemu-gdb
 qemu: ${kerExe}
 	$(qemu) $(qemuOpts)
 
-#	phony
+.gdbinit: .gdbinit.tmpl-riscv
+	sed "s/:1234/:$(gdbPort)/" < $^ > $@
+
+qemu-gdb: ${kerExe} .gdbinit
+	@echo "*** Now run 'gdb' in another window." 1>&2
+	$(qemu) $(qemuOpts) -S $(qemuGdb)
+
+#	helper phony
 .PHONY: show clean all
 show:
-	echo ${kerCSrcFile}
-	echo ${kerObj}
+	$(info ${kerObj})
+	$(info ${kerExe})
 clean:
 	rm -rf ${kerBuildRtPath} ${kerMetaRtPath}
 all: ${kerBuildRtPath}/kernel ${kerAsm}

@@ -1,7 +1,7 @@
-#include "types.h"
-#include "param.h"
-#include "memlayout.h"
-#include "riscv.h"
+#include "define/types.h"
+#include "define/param.h"
+#include "define/memlayout.h"
+#include "define/riscv.h"
 
 
 void main();
@@ -38,7 +38,7 @@ void start() {
 //	timerinit();
 	
 	// keep each CPU's hartid in its tp register, for cpuid().
-	int id = r_mhartid();
+	u64 id = r_mhartid();
 	w_tp(id);
 	
 	// switch to supervisor mode and jump to main().
