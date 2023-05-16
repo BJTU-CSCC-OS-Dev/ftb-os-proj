@@ -3,7 +3,7 @@
         # the kernel, and returns from kernel to user.
         #
         # the kernel maps the page holding this code
-        # at the same virtual address (TRAMPOLINE)
+        # at the same virtual address (trampoline)
         # in user and kernel space so that it continues
         # to work when it switches page tables.
         # kernel.ld causes this code to start at

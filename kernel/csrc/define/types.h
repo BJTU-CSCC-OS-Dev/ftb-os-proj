@@ -14,3 +14,5 @@ typedef int i32;
 typedef long long int i64;
 
 typedef u64 pde_t;
+
+#define nullptr ((void *)0)

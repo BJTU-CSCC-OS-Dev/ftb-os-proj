@@ -1,12 +1,10 @@
 #include <define/riscv.h>
 #include <device/uart.h>
 #include <define/types.h>
+#include <define/macro_builtin.h>
 
 
 bool started = false;
-
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "EndlessLoop"
 
 void main() {
 	u64 cpuId = r_mhartid();
@@ -16,15 +14,14 @@ void main() {
 		 * 		kvm(Doing)
 		 * 		S-Mode mmu(TBD)
 		 */
+		
 		started = true;
 	} else {
 //		while (!started) {}
 		//	disable other cores for now
-		while (true) {}
+		dead_loop();
 		uart_init();
 		uart_poll_putstr("Hello");
 	}
-	while (1) {}
+	dead_loop();
 }
-
-#pragma clang diagnostic pop

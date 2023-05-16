@@ -1,9 +1,9 @@
 #include "uart.h"
 
-#include <define/memlayout.h>
+#include "mem/memlayout.h"
 
 
-#define Reg(reg) ((volatile unsigned char *)(UART0 + reg))
+#define Reg(reg) ((volatile unsigned char *)(uart0Addr + reg))
 
 // the UART control registers.
 // some have different meanings for
