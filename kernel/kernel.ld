@@ -40,5 +40,5 @@ SECTIONS
     *(.bss .bss.*)
   }
 
-  PROVIDE(kmemBegin = .);
+  PROVIDE(KMEM_BEGIN = .);
 }

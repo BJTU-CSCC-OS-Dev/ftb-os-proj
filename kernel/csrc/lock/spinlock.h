@@ -1,5 +1,7 @@
 #pragma once
-
+/*
+ * spinlock define and methods
+ */
 #include <define/types.h>
 
 

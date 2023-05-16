@@ -1,4 +1,7 @@
 #pragma once
+/*
+ * my lib for project
+ */
 #include <define/types.h>
 
 

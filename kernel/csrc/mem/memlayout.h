@@ -12,23 +12,23 @@
 // 10001000 -- virtio disk
 // 80000000 -- boot ROM jumps here in machine mode
 //          -- kernel loads the kernel here
-// [kerBase, kmemBegin)  -- kernel data section and text section is directly mapped here
-// [kmemBegin, kmemStop) -- kmem range.
+// [KER_BASE, KMEM_BEGIN)  -- kernel data section and text section is directly mapped here
+// [KMEM_BEGIN, KMEM_END) -- kmem range.
 
 // qemu puts UART registers here in physical memory.
-#define uart0Addr 0x10000000ULL
+#define UART0_ADDR 0x10000000ULL
 #define UART0_IRQ 10
 
 // virtio mmio interface
-#define virtio0Addr 0x10001000ULL
+#define VIRTIO0_ADDR 0x10001000ULL
 #define VIRTIO0_IRQ 1
 
 // core local interruptor (CLINT), which contains the timer.
 //		mtime : Machine Time
 //		mtimecmp : Machine Time Compare
-#define clintAddr 0x2000000ULL
-#define clintMtimeCmpAddr(hartId) (clintAddr + 0x4000 + 8*(hartId))
-#define clintMtimeAddr (clintAddr + 0xBFF8) // cycles since boot.
+#define CLINT_ADDR 0x2000000ULL
+#define CLINT_MTIME_CMP_ADDR(hartId) (CLINT_ADDR + 0x4000 + 8*(hartId))
+#define CLINT_MTIME_ADDR (CLINT_ADDR + 0xBFF8) // cycles since boot.
 
 // qemu puts platform-level interrupt controller (PLIC) here.
 #define PLIC 0x0c000000ULL
@@ -43,17 +43,17 @@
 
 // the kernel expects there to be RAM
 // for use by the kernel and user pages
-// from physical address 0x80000000 to kmemStop.
-#define kerBase 0x80000000ULL
-#define kmemStop (kerBase + 128*1024*1024)
+// from physical address 0x80000000 to KMEM_END
+#define KER_BASE 0x80000000ULL
+#define KMEM_END (KER_BASE + 128*1024*1024)
 
 // map the trampoline page to the highest address,
 // in both user and kernel space.
-#define trampoline (MAXVA - PGSIZE)
+#define TRAMPOLINE (MAXVA - PGSIZE)
 
 // map kernel stacks beneath the trampoline,
 // each surrounded by invalid guard pages.
-#define kStack(p) (trampoline - ((p)+1)* 2*PGSIZE)
+#define KER_STACK(p) (TRAMPOLINE - ((p)+1)* 2*PGSIZE)
 
 // User memory layout.
 // Address zero first:
@@ -64,6 +64,6 @@
 //   ...
 //   TRAPFRAME (p->trapframe, used by the trampoline)
 //   TRAMPOLINE (the same page as in the kernel)
-#define trapframe (trampoline - PGSIZE)
+#define TRAPFRAME (TRAMPOLINE - PGSIZE)
 
-extern char * kmemBegin;    //	from kernel.ld
+extern char * KMEM_BEGIN;    //	from kernel.ld

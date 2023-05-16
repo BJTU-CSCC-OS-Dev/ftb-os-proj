@@ -2,6 +2,7 @@
 #include <device/uart.h>
 #include <define/types.h>
 #include <define/macro_builtin.h>
+#include <mem/kernel_mem.h>
 
 
 bool started = false;
@@ -14,6 +15,7 @@ void main() {
 		 * 		kvm(Doing)
 		 * 		S-Mode mmu(TBD)
 		 */
+		kmem_init();
 		
 		started = true;
 	} else {
