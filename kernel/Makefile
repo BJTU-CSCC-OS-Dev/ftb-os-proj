@@ -39,8 +39,7 @@ kerAsm += $(patsubst %.c,%.asm,$(addprefix ${kerMetaRtPath}/,${kerCSrcFile}))
 kerAsm += $(patsubst %.S,%.asm,$(addprefix ${kerMetaRtPath}/,${kerSSrcFile}))
 
 #	tool chain options
-ccFlags =  -Wall -Werror
-ccFlags += -O -fno-omit-frame-pointer -ggdb -gdwarf-2 -std=c11
+ccFlags = -Wall -Werror -O -fno-omit-frame-pointer -ggdb -gdwarf-2
 ccFlags += -MD
 ccFlags += -mcmodel=medany
 ccFlags += -ffreestanding -fno-common -nostdlib -mno-relax
