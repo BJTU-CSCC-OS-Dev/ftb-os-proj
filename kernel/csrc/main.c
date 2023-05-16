@@ -18,7 +18,9 @@ void main() {
 		 */
 		started = true;
 	} else {
-		while (!started) {}
+//		while (!started) {}
+		//	disable other cores for now
+		while (true) {}
 		uart_init();
 		uart_poll_putstr("Hello");
 	}
