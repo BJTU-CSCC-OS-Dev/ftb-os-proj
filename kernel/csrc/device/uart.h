@@ -6,4 +6,5 @@
 void uart_init();
 size_t uart_poll_putch(char c);
 size_t uart_poll_getch(void);
+size_t uart_poll_putstr(const char * str);
 

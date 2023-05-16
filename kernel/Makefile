@@ -1,3 +1,9 @@
+# 	macro
+define mkdir_and_touch
+	mkdir -p $1
+	touch $1
+endef
+
 #	tool chain
 ifndef toolPrefix
 toolPrefix := $(shell if riscv64-unknown-elf-objdump -i 2>&1 | grep 'elf64-big' >/dev/null 2>&1; \
@@ -49,38 +55,43 @@ endif
 
 ldFlags = -z max-page-size=4096
 
+#	Rt folders
+${kerBuildRtPath}:
+	$(call mkdir_and_touch, $@)
+${kerMetaRtPath}:
+	$(call mkdir_and_touch, $@)
+
 #	compile rules
-${kerBuildRtPath}/${kerCSrcRtPath}/%.o: ${kerCSrcRtPath}/%.c
-	mkdir -p $(dir $@)
+${kerBuildRtPath}/${kerCSrcRtPath}/%.o: ${kerCSrcRtPath}/%.c | ${kerBuildRtPath}
+	$(call mkdir_and_touch, $(dir $@))
 	${cc} ${ccFlags} -c -o $@ $<
 
-${kerBuildRtPath}/${kerSSrcRtPath}/%.o: ${kerSSrcRtPath}/%.S
-	mkdir -p $(dir $@)
+${kerBuildRtPath}/${kerSSrcRtPath}/%.o: ${kerSSrcRtPath}/%.S | ${kerBuildRtPath}
+	$(call mkdir_and_touch, $(dir $@))
 	${cc} -I${kerCSrcRtPath} -c -o $@ $<
 
-${kerMetaRtPath}/${kerCSrcRtPath}/%.asm: ${kerBuildRtPath}/${kerCSrcRtPath}/%.o
-	mkdir -p ${kerMetaRtPath}
-	mkdir -p $(dir $@)
+${kerMetaRtPath}/${kerCSrcRtPath}/%.asm: ${kerBuildRtPath}/${kerCSrcRtPath}/%.o | ${kerMetaRtPath}
+	$(call mkdir_and_touch, $(dir $@))
 	${objdump} -S $< > $@
 
-${kerMetaRtPath}/${kerSSrcRtPath}/%.asm: ${kerBuildRtPath}/${kerSSrcRtPath}/%.o
-	mkdir -p ${kerMetaRtPath}
-	mkdir -p $(dir $@)
+${kerMetaRtPath}/${kerSSrcRtPath}/%.asm: ${kerBuildRtPath}/${kerSSrcRtPath}/%.o | ${kerMetaRtPath}
+	$(call mkdir_and_touch, $(dir $@))
 	${objdump} -S $< > $@
 
 kerExe = ${kerBuildRtPath}/kernel
-${kerBuildRtPath}/kernel: ${kerObj} ${kerLdSrc}
+${kerExe}: ${kerObj} ${kerLdSrc} ${kerBuildRtPath} | ${kerMetaRtPath}
 	${ld} ${ldFlags} -T ${kerLdSrc} -o $@ ${kerObj}
 	${objdump} -S $@ > ${kerMetaRtPath}/kernel.asm
-	${objdump} -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > ${kerMetaRtPath}/kernel.sym
+
+kerSym = ${kerMetaRtPath}/kernel.sym
+${kerSym}: ${kerExe} | ${kerMetaRtPath}
+	${objdump} -t $< | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $@
 
 -include build/*.d
 
 #	run options
 runCfgFsImgPath := ../user/xv6-user-fs.img
-runCfgNcpu := 1
-
-#	qemu
+runCfgNcpu := 1 #	qemu
 qemu = qemu-system-riscv64
 qemuOpts = -machine virt -bios none -kernel ${kerExe} -m 128M -smp ${runCfgNcpu} -nographic
 qemuOpts += -global virtio-mmio.force-legacy=false
@@ -108,6 +119,7 @@ qemu-gdb: ${kerExe} .gdbinit
 show:
 	$(info ${kerObj})
 	$(info ${kerExe})
+	$(info ${kerAsm})
 clean:
 	rm -rf ${kerBuildRtPath} ${kerMetaRtPath}
-all: ${kerBuildRtPath}/kernel ${kerAsm}
+all: ${kerExe} ${kerAsm} ${kerSym}

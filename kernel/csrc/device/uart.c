@@ -50,3 +50,10 @@ size_t uart_poll_getch(void) {
 		return UART_FALSE;
 	}
 }
+
+size_t uart_poll_putstr(const char * str) {
+	const char * p = str;
+	size_t cnt = 0;
+	while (*p) { cnt += uart_poll_putch(*(p++)); }
+	return cnt;
+}
