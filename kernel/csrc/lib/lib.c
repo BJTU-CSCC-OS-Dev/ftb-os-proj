@@ -4,7 +4,7 @@
 #include <device/uart.h>
 
 
-inline void u64_to_str(u64 x, char * buf) {
+static inline void u64_to_str(u64 x, char * buf) {
 	size_t i = 0;
 	while (x) {
 		buf[i] = x % 10;
@@ -36,6 +36,7 @@ assert_impl(bool cond, const char * condStr, const char * file, u64 line, const 
 		uart_poll_putstr("] :");
 		uart_poll_putstr(info);
 	}
+	dead_loop();
 }
 
 void panic(const char * info) {

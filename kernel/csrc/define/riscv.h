@@ -269,9 +269,9 @@ typedef u64 * pagetable_t; // 512 PTEs
 #define PGSHIFT 12  // bits of offset within a page
 
 //	PGROUNDUP: The smallest PGSIZE aligned address greater or equal to a
-#define PGROUNDUP(a)  (((a)+PGSIZE-1) & ~(PGSIZE-1))
+#define PGROUNDUP(a)  ((((u64)(a))+PGSIZE-1) & ~(PGSIZE-1))
 //	PGROUNDDOWN: The biggest PGSIZE aligned address below or equal to a
-#define PGROUNDDOWN(a) (((a)) & ~(PGSIZE-1))
+#define PGROUNDDOWN(a) ((((u64)(a))) & ~(PGSIZE-1))
 
 #define PTE_V (1L << 0) // valid
 #define PTE_R (1L << 1)

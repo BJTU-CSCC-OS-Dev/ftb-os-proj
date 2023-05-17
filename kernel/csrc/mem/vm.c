@@ -11,7 +11,7 @@
 
 pagetable_t kernelPagetableRoot;
 
-int vm_create_kernel_map(u64 va, u64 pa, u64 size, pte_t flag);
+void vm_create_kernel_map(u64 va, u64 pa, u64 size, pte_t flag);
 
 void vm_init_kernel_map() {
 	kernelPagetableRoot = kmem_alloc();
@@ -55,7 +55,7 @@ pte_t * vm_walk(pagetable_t root, u64 va, bool alloc) {
 }
 
 //	create disjoint tables
-int vm_create_kernel_map(u64 va, u64 pa, u64 size, pte_t flag) {
+void vm_create_kernel_map(u64 va, u64 pa, u64 size, pte_t flag) {
 	u64 a, last;
 	pte_t * pte;
 	a = PGROUNDDOWN(va);

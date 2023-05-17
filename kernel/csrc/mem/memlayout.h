@@ -69,5 +69,5 @@
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)
 
 //	from kernel.ld
-extern char * KMEM_BEGIN;
-extern char * KER_TEXT_END;
+extern char KMEM_BEGIN[];
+extern char KER_TEXT_END[];

@@ -79,7 +79,7 @@ ${kerMetaRtPath}/${kerSSrcRtPath}/%.asm: ${kerBuildRtPath}/${kerSSrcRtPath}/%.o 
 	${objdump} -S $< > $@
 
 kerExe = ${kerBuildRtPath}/kernel
-${kerExe}: ${kerObj} ${kerLdSrc} ${kerBuildRtPath} | ${kerMetaRtPath}
+${kerExe}: ${kerObj} ${kerLdSrc} | ${kerBuildRtPath} ${kerMetaRtPath}
 	${ld} ${ldFlags} -T ${kerLdSrc} -o $@ ${kerObj}
 	${objdump} -S $@ > ${kerMetaRtPath}/kernel.asm
 
