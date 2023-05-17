@@ -15,13 +15,13 @@ void kmem_init() {
 	//	kmem : [KMEM_BEGIN, KMEM_STOP)
 	kmemPageHead.nxt = nullptr;
 	u64 addrBegin = PGROUNDUP((u64) KMEM_BEGIN);
-	u64 addrEnd = PGROUNDUP((u64) KMEM_END);
+	u64 addrEnd = KMEM_END;    //	note : KMEM_END is always page aligned
 	for (u64 addr = addrBegin; addr != addrEnd; addr += PGSIZE) {
 		kmem_free((struct KmemPage *) addr);
 	}
 }
 
-struct KmemPage * kmem_alloc() {
+void * kmem_alloc() {
 	spinlock_acquire(&kmemLock);
 	struct KmemPage * p = kmemPageHead.nxt;
 	if (p) {

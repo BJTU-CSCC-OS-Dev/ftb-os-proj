@@ -12,8 +12,9 @@
 // 10001000 -- virtio disk
 // 80000000 -- boot ROM jumps here in machine mode
 //          -- kernel loads the kernel here
-// [KER_BASE, KMEM_BEGIN)  -- kernel data section and text section is directly mapped here
-// [KMEM_BEGIN, KMEM_END) -- kmem range.
+// [KER_BASE, KER_TEXT_END    -- kernel text section
+// [KER_TEXT_END, KMEM_BEGIN) -- kernel data section
+// [KMEM_BEGIN, KMEM_END)     -- kmem range.
 
 // qemu puts UART registers here in physical memory.
 #define UART0_ADDR 0x10000000ULL
@@ -31,29 +32,30 @@
 #define CLINT_MTIME_ADDR (CLINT_ADDR + 0xBFF8) // cycles since boot.
 
 // qemu puts platform-level interrupt controller (PLIC) here.
-#define PLIC 0x0c000000ULL
-#define PLIC_PRIORITY (PLIC + 0x0)
-#define PLIC_PENDING (PLIC + 0x1000)
-#define PLIC_MENABLE(hart) (PLIC + 0x2000 + (hart)*0x100)
-#define PLIC_SENABLE(hart) (PLIC + 0x2080 + (hart)*0x100)
-#define PLIC_MPRIORITY(hart) (PLIC + 0x200000 + (hart)*0x2000)
-#define PLIC_SPRIORITY(hart) (PLIC + 0x201000 + (hart)*0x2000)
-#define PLIC_MCLAIM(hart) (PLIC + 0x200004 + (hart)*0x2000)
-#define PLIC_SCLAIM(hart) (PLIC + 0x201004 + (hart)*0x2000)
+#define PLIC_ADDR 0x0c000000ULL
+#define PLIC_PRIORITY (PLIC_ADDR + 0x0)
+#define PLIC_PENDING (PLIC_ADDR + 0x1000)
+#define PLIC_MENABLE(hart) (PLIC_ADDR + 0x2000 + (hart)*0x100)
+#define PLIC_SENABLE(hart) (PLIC_ADDR + 0x2080 + (hart)*0x100)
+#define PLIC_MPRIORITY(hart) (PLIC_ADDR + 0x200000 + (hart)*0x2000)
+#define PLIC_SPRIORITY(hart) (PLIC_ADDR + 0x201000 + (hart)*0x2000)
+#define PLIC_MCLAIM(hart) (PLIC_ADDR + 0x200004 + (hart)*0x2000)
+#define PLIC_SCLAIM(hart) (PLIC_ADDR + 0x201004 + (hart)*0x2000)
 
 // the kernel expects there to be RAM
 // for use by the kernel and user pages
 // from physical address 0x80000000 to KMEM_END
 #define KER_BASE 0x80000000ULL
+//	KMEM_END % PGSIZE is always 0
 #define KMEM_END (KER_BASE + 128*1024*1024)
 
 // map the trampoline page to the highest address,
 // in both user and kernel space.
 #define TRAMPOLINE (MAXVA - PGSIZE)
 
-// map kernel stacks beneath the trampoline,
-// each surrounded by invalid guard pages.
-#define KER_STACK(p) (TRAMPOLINE - ((p)+1)* 2*PGSIZE)
+//	top and bottom of kernel proc stack ([TOP, BOTTOM))
+#define KER_PROC_STACK_TOP_ADDR(p) (TRAMPOLINE - ((p * 1ULL)+1) * 2 * PGSIZE)
+#define KER_PROC_STACK_BOTTOM_ADDR(p) (KER_PROC_STACK_TOP_ADDR(p) + PGSIZE)
 
 // User memory layout.
 // Address zero first:
@@ -66,4 +68,6 @@
 //   TRAMPOLINE (the same page as in the kernel)
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)
 
-extern char * KMEM_BEGIN;    //	from kernel.ld
+//	from kernel.ld
+extern char * KMEM_BEGIN;
+extern char * KER_TEXT_END;

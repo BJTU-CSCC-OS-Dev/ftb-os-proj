@@ -1,7 +1,7 @@
 #include "spinlock.h"
 
 #include <define/riscv.h>
-#include <define/macro_builtin.h>
+#include "lib/macro_builtin.h"
 
 
 void spinlock_init(struct Spinlock * this, const char * name) {
@@ -10,7 +10,7 @@ void spinlock_init(struct Spinlock * this, const char * name) {
 }
 
 void spinlock_acquire(struct Spinlock * this) {
-	loop (sync_test_and_set(&this->locked, 1));
+	loop_until (sync_test_and_set(&this->locked, 1));
 	wall();
 }
 

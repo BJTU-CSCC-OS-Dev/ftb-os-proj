@@ -17,6 +17,8 @@ typedef int i32;
 typedef long long int i64;
 
 typedef u64 pde_t;
+typedef u64 pte_t;	//	page table entry
+typedef pte_t * pagetable_t;
 
 #define nullptr ((void *)0)
 
