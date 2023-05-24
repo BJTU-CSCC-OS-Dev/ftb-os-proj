@@ -120,6 +120,8 @@ show:
 	$(info ${kerObj})
 	$(info ${kerExe})
 	$(info ${kerAsm})
+
 clean:
 	rm -rf ${kerBuildRtPath} ${kerMetaRtPath}
+
 all: ${kerExe} ${kerAsm} ${kerSym}
