@@ -224,7 +224,7 @@ static inline void intr_off() {
 }
 
 // are device interrupts enabled?
-static inline int intr_get() {
+static inline u64 intr_get() {
 	u64 x = r_sstatus();
 	return (x & SSTATUS_SIE) != 0;
 }

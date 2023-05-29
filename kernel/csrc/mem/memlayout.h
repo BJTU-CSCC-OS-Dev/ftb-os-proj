@@ -54,7 +54,7 @@
 #define TRAMPOLINE (MAXVA - PGSIZE)
 
 //	top and bottom of kernel proc stack ([TOP, BOTTOM))
-#define KER_PROC_STACK_TOP_ADDR(p) (TRAMPOLINE - ((p * 1ULL)+1) * 2 * PGSIZE)
+#define KER_PROC_STACK_TOP_ADDR(p) (TRAMPOLINE - (((p) * 1ULL)+1) * 2 * PGSIZE)
 #define KER_PROC_STACK_BOTTOM_ADDR(p) (KER_PROC_STACK_TOP_ADDR(p) + PGSIZE)
 
 // User memory layout.

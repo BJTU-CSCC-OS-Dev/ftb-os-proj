@@ -10,7 +10,7 @@
 bool started = false;
 
 void main() {
-	u64 cpuId = cpu_id();
+	u64 cpuId = cpu_get_this_id();
 	if (cpuId == 0) {
 		/*	init process :
 		 * 		console(TBD)
@@ -18,9 +18,12 @@ void main() {
 		 * 		S-Mode mmu(TBD)
 		 */
 		uart_init();
+		uart_poll_putstr("nbs kernel is booting\n");
 		kmem_init();
 		vm_init_kernel_map();
 		vm_init_kernel_map_for_every_cpu();
+		kerproc_init_all();
+		//	trapinit?
 		uart_poll_putstr("Hello");
 		started = true;
 	} else {
