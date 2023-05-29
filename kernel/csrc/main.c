@@ -20,14 +20,14 @@ void main() {
 		uart_init();
 		kmem_init();
 		vm_init_kernel_map();
-		vm_inti_kernel_map_for_every_cpu();
+		vm_init_kernel_map_for_every_cpu();
 		uart_poll_putstr("Hello");
 		started = true;
 	} else {
 //		while (!started) {}
 		//	disable other cores for now
 		dead_loop();
-		vm_inti_kernel_map_for_every_cpu();
+		vm_init_kernel_map_for_every_cpu();
 		uart_poll_putstr("Hello");
 	}
 	dead_loop();

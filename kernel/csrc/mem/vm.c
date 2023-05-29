@@ -19,7 +19,7 @@ void vm_init_kernel_map() {
 	vm_create_kernel_map(UART0_ADDR, UART0_ADDR, PGSIZE, PTE_R | PTE_W);
 	vm_create_kernel_map(VIRTIO0_ADDR, VIRTIO0_ADDR, PGSIZE, PTE_R | PTE_W);
 	vm_create_kernel_map(PLIC_ADDR, PLIC_ADDR, PGSIZE, PTE_R | PTE_W);
-	vm_create_kernel_map(KER_BASE, KER_BASE, (u64) (KER_TEXT_END) - KER_BASE, PTE_R | PTE_W);
+	vm_create_kernel_map(KER_BASE, KER_BASE, (u64) (KER_TEXT_END) - KER_BASE, PTE_R | PTE_X);
 	vm_create_kernel_map((u64) KER_TEXT_END, (u64) KER_TEXT_END, KMEM_END - (u64) KER_TEXT_END, PTE_R | PTE_W);
 	vm_create_kernel_map(TRAMPOLINE, (u64) trampoline, PGSIZE, PTE_R | PTE_X);
 	//	alloca a page for every kernel stack
@@ -30,15 +30,14 @@ void vm_init_kernel_map() {
 	}
 }
 
-void vm_inti_kernel_map_for_every_cpu() {
-	sfence_vma();
-	w_satp(MAKE_SATP(kernelPagetableRoot));
+void vm_init_kernel_map_for_every_cpu() {
+	u64 r = MAKE_SATP(kernelPagetableRoot);
+	w_satp(r);
 	sfence_vma();
 }
 
 //	get the last level pte by walking. root should be created before.
 pte_t * vm_walk(pagetable_t root, u64 va, bool alloc) {
-	assert(va < MAXVA, "");
 	for (u64 level = 2; level != 0; --level) {
 		pte_t * pte = &root[PX(level, va)];
 		if (*pte & PTE_V) {
@@ -63,7 +62,7 @@ void vm_create_kernel_map(u64 va, u64 pa, u64 size, pte_t flag) {
 	loop {
 		pte = vm_walk(kernelPagetableRoot, a, true);
 		assert(pte != nullptr, "pte is nullptr");
-		assert(*pte & PTE_V, "remap");
+		assert(!(*pte & PTE_V), "remap");
 		*pte = PA2PTE(pa) | flag | PTE_V;
 		if (a == last) { break; }
 		a += PGSIZE;

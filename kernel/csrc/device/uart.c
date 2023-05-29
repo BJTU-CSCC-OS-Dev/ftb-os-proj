@@ -57,3 +57,44 @@ size_t uart_poll_putstr(const char * str) {
 	while (*p) { cnt += uart_poll_putch(*(p++)); }
 	return cnt;
 }
+
+size_t uart_poll_put_u64(u64 u) {
+	u8 stk[20], stTop = 0;
+	while (u) {
+		stk[stTop++] = u % 10;
+		u /= 10;
+	}
+	if (stTop == 0) {
+		uart_poll_putch('0');
+		return 1;
+	} else {
+		for (u8 i = stTop - 1;; --i) {
+			uart_poll_putch((u8) (stk[i]) + (u8) ('0'));
+			if (i == 0) {
+				break;
+			}
+		}
+		return stTop;
+	}
+}
+
+size_t uart_poll_put_ptr(void * p) {
+	u64 u = (u64) p;
+	u8 stk[20], stTop = 0;
+	while (u) {
+		stk[stTop++] = u % 10;
+		u /= 10;
+	}
+	if (stTop == 0) {
+		uart_poll_putch('0');
+		return 1;
+	} else {
+		for (u8 i = stTop - 1;; --i) {
+			uart_poll_putch((u8) (stk[i]) + (u8) ('0'));
+			if (i == 0) {
+				break;
+			}
+		}
+		return stTop;
+	}
+}

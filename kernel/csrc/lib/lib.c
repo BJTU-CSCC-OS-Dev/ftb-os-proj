@@ -22,21 +22,19 @@ static inline void u64_to_str(u64 x, char * buf) {
 void
 assert_impl(bool cond, const char * condStr, const char * file, u64 line, const char * funcInfo, const char * info) {
 	if (!cond) {
-		char lineStr[20] = { };
-		u64_to_str(line, lineStr);
 		uart_poll_putstr("assert ");
 		uart_poll_putstr("[");
 		uart_poll_putstr(condStr);
 		uart_poll_putstr("] failed at [");
 		uart_poll_putstr(file);
 		uart_poll_putstr("::");
-		uart_poll_putstr(lineStr);
+		uart_poll_put_u64(line);
 		uart_poll_putstr(", ");
 		uart_poll_putstr(funcInfo);
 		uart_poll_putstr("] :");
 		uart_poll_putstr(info);
+		dead_loop();
 	}
-	dead_loop();
 }
 
 void panic(const char * info) {

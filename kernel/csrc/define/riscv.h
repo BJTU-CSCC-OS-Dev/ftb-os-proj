@@ -161,7 +161,7 @@ static inline void w_pmpaddr0(u64 x) {
 }
 
 // use riscv's sv39 page table scheme.
-#define SATP_SV39 (8L << 60)
+#define SATP_SV39 (8ULL << 60)
 
 #define MAKE_SATP(pagetable) (SATP_SV39 | (((u64)pagetable) >> 12))
 
